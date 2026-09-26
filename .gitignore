@@ -1,0 +1,5 @@
+node_modules/
+.env
+diagnostic_db.sqlite
+*.log
+coverage/
