@@ -1,4 +1,4 @@
-# Diagnostic Test Booking API
+# Diagnostic Test Booking - EVE Healthcare Intern Assignment
 
 This is a backend service for a diagnostic test booking and payments system built with Node.js, Express, PostgreSQL, and Sequelize.
 
