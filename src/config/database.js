@@ -6,7 +6,7 @@ const isTest = process.env.NODE_ENV === 'test';
 const sequelize = isTest
   ? new Sequelize({
       dialect: 'sqlite',
-      storage: ':memory:',
+      storage: './dev.sqlite', // File-based so seed and server share the same DB
       logging: false,
     })
   : new Sequelize(
