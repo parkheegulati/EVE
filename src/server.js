@@ -3,12 +3,18 @@ const { sequelize } = require('./models');
 
 const PORT = process.env.PORT || 3000;
 
+// Fail fast if critical env vars are missing
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET environment variable is not set. Refusing to start.');
+  process.exit(1);
+}
+
 async function startServer() {
   try {
     await sequelize.authenticate();
     console.log('Database connection has been established successfully.');
-    
-    // Sync models (in production, you would use migrations instead of sync)
+
+    // Sync models (in production, use migrations instead of sync)
     await sequelize.sync();
     console.log('Models synchronized with database.');
 
@@ -18,6 +24,7 @@ async function startServer() {
     });
   } catch (error) {
     console.error('Unable to connect to the database:', error);
+    process.exit(1);
   }
 }
 

@@ -5,13 +5,10 @@ services:
     build: .
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASS=postgres
-      - DB_NAME=diagnostic_db
-      - JWT_SECRET=supersecretjwtkey
     depends_on:
       db:
         condition: service_healthy

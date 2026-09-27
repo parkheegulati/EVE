@@ -5,19 +5,37 @@ exports.createBooking = async (req, res) => {
     const { test_id, appointment_time } = req.body;
     const user_id = req.user.userId;
 
-    if (!test_id || !appointment_time) {
+    // Validate required fields
+    if (!test_id || appointment_time === undefined || appointment_time === null || appointment_time === '') {
       return res.status(400).json({ error: 'test_id and appointment_time are required' });
     }
 
-    const test = await Test.findByPk(test_id);
+    // Validate test_id is a positive integer
+    const parsedTestId = parseInt(test_id, 10);
+    if (!Number.isInteger(parsedTestId) || parsedTestId <= 0 || String(parsedTestId) !== String(test_id)) {
+      return res.status(400).json({ error: 'test_id must be a valid positive integer' });
+    }
+
+    // Validate appointment_time is a valid date
+    const appointmentDate = new Date(appointment_time);
+    if (isNaN(appointmentDate.getTime())) {
+      return res.status(400).json({ error: 'appointment_time must be a valid ISO 8601 date-time string' });
+    }
+
+    // Appointment must be in the future (all times treated as UTC)
+    if (appointmentDate <= new Date()) {
+      return res.status(400).json({ error: 'appointment_time must be in the future' });
+    }
+
+    const test = await Test.findByPk(parsedTestId);
     if (!test) {
       return res.status(404).json({ error: 'Test not found' });
     }
 
     const booking = await Booking.create({
       user_id,
-      test_id,
-      appointment_time,
+      test_id: parsedTestId,
+      appointment_time: appointmentDate,
       amount: test.price,
       status: 'PENDING'
     });
@@ -71,7 +89,7 @@ exports.getBookingById = async (req, res) => {
     }
 
     if (booking.user_id !== user_id) {
-      return res.status(403).json({ error: 'Unauthorized access to booking' });
+      return res.status(403).json({ error: 'Forbidden: you do not own this booking' });
     }
 
     res.json(booking);

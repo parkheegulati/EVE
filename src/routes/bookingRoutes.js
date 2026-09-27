@@ -25,16 +25,25 @@ router.use(authMiddleware);
  *             properties:
  *               test_id:
  *                 type: integer
+ *                 description: Must be a valid positive integer referencing an existing test
  *               appointment_time:
  *                 type: string
  *                 format: date-time
+ *                 description: |
+ *                   ISO 8601 date-time string. Must be a valid date and must be in the future (UTC).
+ *                   Example: "2026-12-01T10:00:00Z"
  *     responses:
  *       201:
  *         description: Booking created successfully
  *       400:
- *         description: Invalid input
+ *         description: |
+ *           Invalid input. Possible reasons:
+ *           - test_id or appointment_time missing
+ *           - test_id is not a positive integer
+ *           - appointment_time is not a valid date
+ *           - appointment_time is in the past
  *       401:
- *         description: Unauthorized
+ *         description: Unauthenticated — JWT missing or invalid
  *       404:
  *         description: Test not found
  */
@@ -52,7 +61,7 @@ router.post('/', bookingController.createBooking);
  *       200:
  *         description: List of bookings
  *       401:
- *         description: Unauthorized
+ *         description: Unauthenticated — JWT missing or invalid
  */
 router.get('/', bookingController.getUserBookings);
 
@@ -74,9 +83,9 @@ router.get('/', bookingController.getUserBookings);
  *       200:
  *         description: Booking details
  *       401:
- *         description: Unauthorized
+ *         description: Unauthenticated — JWT missing or invalid
  *       403:
- *         description: Forbidden (belongs to another user)
+ *         description: Forbidden — booking belongs to another user
  *       404:
  *         description: Booking not found
  */
